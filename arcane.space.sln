@@ -1,15 +1,14 @@
-﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.27004.2009
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "services", "src\services.fsproj", "{23203630-A90F-4743-96E9-F7D8017C74B3}"
+Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "arcane.space.front", "front\src\arcane.space.front.fsproj", "{E5DEFC96-37CF-4844-9C9E-CFA0A9A8AED3}"
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "arcane.space.back", "backend\src\arcane.space.back.fsproj", "{23203630-A90F-4743-96E9-F7D8017C74B3}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "project", "project", "{6348AA5E-C6AA-425C-BED1-BA89ACE11E18}"
 	ProjectSection(SolutionItems) = preProject
 		build.fsx = build.fsx
-		paket.dependencies = paket.dependencies
-		web.config = web.config
 	EndProjectSection
 EndProject
 Global
@@ -18,6 +17,10 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E5DEFC96-37CF-4844-9C9E-CFA0A9A8AED3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E5DEFC96-37CF-4844-9C9E-CFA0A9A8AED3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E5DEFC96-37CF-4844-9C9E-CFA0A9A8AED3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E5DEFC96-37CF-4844-9C9E-CFA0A9A8AED3}.Release|Any CPU.Build.0 = Release|Any CPU
 		{23203630-A90F-4743-96E9-F7D8017C74B3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{23203630-A90F-4743-96E9-F7D8017C74B3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{23203630-A90F-4743-96E9-F7D8017C74B3}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -25,5 +28,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {D6105885-6F8F-4DCC-AD04-358093ED8358}
 	EndGlobalSection
 EndGlobal

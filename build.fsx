@@ -20,7 +20,7 @@ Target "clean" (fun _ ->
 )
 
 Target "build" (fun _ ->
-  [ "arcane.space.backend.sln" ]
+  [ "arcane.space.sln" ]
   |> MSBuildRelease "" "Rebuild"
   |> Log ""
 )
@@ -35,7 +35,7 @@ let startServers () =
   ExecProcessWithLambdas
     (fun info -> 
         info.FileName <- System.IO.Path.GetFullPath fsiPath
-        info.Arguments <- "--load:src/debug.fsx"
+        info.Arguments <- "--load:backend/src/debug.fsx"
         info.WorkingDirectory <- __SOURCE_DIRECTORY__)
     TimeSpan.MaxValue false ignore ignore 
 
@@ -79,7 +79,7 @@ Target "deploy" (fun _ ->
   CleanDir deployroot
   CleanDir (deployroot </> "bin")
   CopyRecursive "bin" (deployroot </> "bin") false |> ignore
-  let config = File.ReadAllText("web.config").Replace("%DEPLOY_SUBDIRECTORY%", subdir)
+  let config = File.ReadAllText("backend/web.config").Replace("%DEPLOY_SUBDIRECTORY%", subdir)
   File.WriteAllText(wwwroot </> "web.config", config)
 
   // Try to delete previous folders, but ignore failures

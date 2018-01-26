@@ -1,4 +1,4 @@
-module Services.Main
+module Arcane.Space.Back.Main
 
 // --------------------------------------------------------------------------------------
 // Entry-point for a real compiled server
@@ -11,7 +11,7 @@ open System
 
 /// List of available servers - corresponds to folders
 let servers = 
-  [ "demo", Services.Demo.app ] |> dict
+  [ "demo", Arcane.Space.Back.Demo.app ] |> dict
   
 /// Drop the <s> part from http://localhost:123/<s>/something
 let dropPrefix part ctx = 

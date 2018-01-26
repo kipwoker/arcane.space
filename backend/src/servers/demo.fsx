@@ -5,7 +5,7 @@
 #r "FSharp.Data/lib/net40/FSharp.Data.dll"
 #load "../common/serializer.fs"
 #else
-module Services.Demo
+module Arcane.Space.Back.Demo
 #endif
 open System
 open FSharp.Data
@@ -16,7 +16,7 @@ open System.Collections.Generic
 //
 // ------------------------------------------------------------------------------------------------
 
-open TheGamma.Services
+open Arcane.Space.Back
 // TODO: Maybe put something useful here :-)
 
 // ------------------------------------------------------------------------------------------------

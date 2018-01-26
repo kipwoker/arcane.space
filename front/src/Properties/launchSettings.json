@@ -1,0 +1,7 @@
+{
+  "profiles": {
+    "arcane.space.front": {
+      "commandName": "Executable"
+    }
+  }
+}

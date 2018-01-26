@@ -1,4 +1,4 @@
-FRAMEWORK: >= NET40
+RESTRICTION: >= net40
 NUGET
   remote: https://www.nuget.org/api/v2
     FAKE (4.61.2)
@@ -14,5 +14,5 @@ NUGET
       FSharp.Core (>= 4.0.0.1)
     System.Collections.Immutable (1.3.1)
     System.Reflection.Metadata (1.4.2)
-      System.Collections.Immutable (>= 1.3.1) - framework: >= net45
+      System.Collections.Immutable (>= 1.3.1) - restriction: >= net45
     System.ValueTuple (4.3.1)
