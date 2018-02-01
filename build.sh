@@ -69,5 +69,16 @@ then
   run $PAKET_BOOTSTRAPPER_EXE
 fi
 
+set +e
 run $PAKET_EXE restore
+restore_exitcode=$?
+set -e
+
+if [ $restore_exitcode -ne 0 ]
+then
+  echo "Restore failed"
+  echo "Try install"
+  run $PAKET_EXE install
+fi
+
 run $FAKE_EXE "$@" $FSIARGS $FSIARGS2 build.fsx

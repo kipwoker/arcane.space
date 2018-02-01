@@ -9,7 +9,6 @@ open System.IO
 open FSharp.Data
 
 System.Environment.CurrentDirectory <- __SOURCE_DIRECTORY__
-let fsiPath = "packages/FSharp.Compiler.Tools/tools/fsiAnyCpu.exe"
 
 // --------------------------------------------------------------------------------------
 // For deployed run - compile as an executable
@@ -31,14 +30,6 @@ Target "build" (fun _ ->
 // For local run - automatically reloads scripts
 // --------------------------------------------------------------------------------------
 
-let startServers () = 
-  ExecProcessWithLambdas
-    (fun info -> 
-        info.FileName <- System.IO.Path.GetFullPath fsiPath
-        info.Arguments <- "--load:backend/src/debug.fsx"
-        info.WorkingDirectory <- __SOURCE_DIRECTORY__)
-    TimeSpan.MaxValue false ignore ignore 
-
 Target "start" (fun _ ->
   async { return startServers() } 
   |> Async.Ignore
@@ -48,7 +39,7 @@ Target "start" (fun _ ->
   while not started do
     try
       use wc = new System.Net.WebClient()
-      started <- wc.DownloadString("http://localhost:10039/").Contains("running")
+      started <- wc.DownloadString("http://localhost:8080/").Contains("running")
     with _ ->
       System.Threading.Thread.Sleep(1000)
       printfn "Waiting for servers to start...."

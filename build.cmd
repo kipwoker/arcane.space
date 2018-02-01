@@ -8,6 +8,10 @@ if errorlevel 1 (
 
 .paket\paket.exe restore
 if errorlevel 1 (
+  .paket\paket.exe install
+  if errorlevel 1 (
+    exit /b %errorlevel%
+  )
   exit /b %errorlevel%
 )
 
