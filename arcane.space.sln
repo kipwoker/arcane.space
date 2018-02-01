@@ -2,9 +2,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27004.2009
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "arcane.space.front", "front\src\arcane.space.front.fsproj", "{E5DEFC96-37CF-4844-9C9E-CFA0A9A8AED3}"
-EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "arcane.space.back", "backend\arcane.space.back.fsproj", "{23203630-A90F-4743-96E9-F7D8017C74B3}"
+EndProject
+Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "arcane.space.front", "front\src\arcane.space.front.fsproj", "{E5DEFC96-37CF-4844-9C9E-CFA0A9A8AED3}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "project", "project", "{6348AA5E-C6AA-425C-BED1-BA89ACE11E18}"
 	ProjectSection(SolutionItems) = preProject

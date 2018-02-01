@@ -26,6 +26,34 @@ let helloMachine =
         methods [GET; HEAD; OPTIONS]
         handleOk sayHello }
 
+let ping =
+    freya {
+        return Represent.text "pong"        
+    }
+
+let pingMachine =
+    freyaMachine {
+        methods [GET]
+        handleOk ping
+    }
+
+
+let shutdown = freya {
+        Infrastructure.serverCancellationTokenSource.CancelAfter(1000)
+        return Represent.text "shutdown"
+    }
+
+let shutdownMachine =
+    freyaMachine {
+        methods [GET]
+        handleOk shutdown
+    }
+
 let root =
     freyaRouter {
-        resource "/hello{/name}" helloMachine }
+        resource "/hello{/name}" helloMachine
+        resource "/ping" pingMachine
+        #if DEBUG
+        resource "/shutdown" shutdownMachine
+        #endif
+    }

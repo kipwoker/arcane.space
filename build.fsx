@@ -3,82 +3,143 @@
 // --------------------------------------------------------------------------------------
 
 #r "packages/FAKE/tools/FakeLib.dll"
+open Microsoft.FSharp.Reflection
 open Fake
+open System.Threading
 open System
 open System.IO
-open FSharp.Data
 
 System.Environment.CurrentDirectory <- __SOURCE_DIRECTORY__
 
+let solution = "arcane.space.sln"
+
+type Configuration = Debug | Release
+
+let configurations = FSharpType.GetUnionCases typeof<Configuration> |> Seq.map (fun u -> u.Name)
+
+configurations
+|> Seq.iter 
+  (fun configuration ->
+    let withConf value = value + configuration
+
+    Target ("clean" |> withConf) (fun _ ->
+      CleanDirs ["bin"; configuration]
+    )
+
+    Target ("build" |> withConf) (fun _ ->
+      DotNetCli
+        .Build 
+        (fun p ->
+                { 
+                  p with 
+                    Project = solution
+                    Configuration = configuration
+                } 
+        )  
+    )
+
+    ("clean" |> withConf) ==> ("build" |> withConf)
+
+    |> ignore
+  )
+
+let toString (x:'a) = 
+    match FSharpValue.GetUnionFields(x, typeof<'a>) with
+    | case, _ -> case.Name
+
 // --------------------------------------------------------------------------------------
-// For deployed run - compile as an executable
+// DEBUG
 // --------------------------------------------------------------------------------------
 
-Target "clean" (fun _ ->
-  CleanDirs ["bin"]
-)
+let port = "8111"
+let rootUrl = String.Format("http://localhost:{0}", port)
 
-Target "build" (fun _ ->
-  [ "arcane.space.sln" ]
-  |> MSBuildRelease "" "Rebuild"
-  |> Log ""
-)
+let startCancellationTokenSource = new CancellationTokenSource()
 
-"clean" ==> "build"
-
-// --------------------------------------------------------------------------------------
-// For local run - automatically reloads scripts
-// --------------------------------------------------------------------------------------
-
-Target "start" (fun _ ->
-  async { return startServers() } 
-  |> Async.Ignore
-  |> Async.Start
-  
-  let mutable started = false
-  while not started do
+let waitFor path condition waitingMsg =
+  let mutable successed = false
+  while not successed do
     try
-      use wc = new System.Net.WebClient()
-      started <- wc.DownloadString("http://localhost:8080/").Contains("running")
+      use webClient = new System.Net.WebClient()
+      let response = webClient.DownloadString(rootUrl + "/" + path)
+      successed <- condition response
     with _ ->
       System.Threading.Thread.Sleep(1000)
-      printfn "Waiting for servers to start...."
+      printfn waitingMsg
+
+let waitWhile path condition waitingMsg =
+  let mutable successed = false
+  while not successed do
+    try
+      use webClient = new System.Net.WebClient()
+      let response = webClient.DownloadString(rootUrl + "/" + path)
+      if condition response then
+        System.Threading.Thread.Sleep(1000)
+        printfn waitingMsg
+      else
+        successed <- true      
+    with _ ->
+      successed <- true
+
+Target "start" (fun _ ->
+  let startTask = 
+    async { 
+      return DotNetCli
+        .RunCommand
+        (fun p -> 
+            {p with
+              WorkingDir = Path.Combine(__SOURCE_DIRECTORY__, "backend")
+              ToolPath = "dotnet"
+            })
+        ("run " + port)
+      } 
+
+  Async.Start (startTask, startCancellationTokenSource.Token)
+  
+  waitFor "ping" (fun response -> response = "pong") "Waiting for server to start..."
   traceImportant "Servers started...."
 )
 
 Target "run" (fun _ ->
   traceImportant "Press any key to stop!"
-  Console.ReadKey() |> ignore
+  Console.ReadKey() 
+  |> (fun _ -> 
+        waitWhile "shutdown" (fun response -> response = "shutdown") "Waiting for server to shutdown..."
+        startCancellationTokenSource.Cancel()
+     )
+  |> ignore
 )
 
 "start" ==> "run"
 
-// --------------------------------------------------------------------------------------
-// Azure - deploy copies the binary to wwwroot/bin
-// --------------------------------------------------------------------------------------
-
-let newName prefix f = 
-  Seq.initInfinite (sprintf "%s_%d" prefix) |> Seq.skipWhile (f >> not) |> Seq.head
-
-Target "deploy" (fun _ ->
-  // Pick a subfolder that does not exist
-  let wwwroot = "../wwwroot"
-  let subdir = newName "deploy" (fun sub -> not (Directory.Exists(wwwroot </> sub)))
-  
-  // Deploy everything into new empty folder
-  let deployroot = wwwroot </> subdir
-  CleanDir deployroot
-  CleanDir (deployroot </> "bin")
-  CopyRecursive "bin" (deployroot </> "bin") false |> ignore
-  let config = File.ReadAllText("backend/web.config").Replace("%DEPLOY_SUBDIRECTORY%", subdir)
-  File.WriteAllText(wwwroot </> "web.config", config)
-
-  // Try to delete previous folders, but ignore failures
-  for dir in Directory.GetDirectories(wwwroot) do
-    if Path.GetFileName(dir) <> subdir then 
-      try CleanDir dir; DeleteDir dir with _ -> ()
+Target "rerun" (fun _ ->
+  "build" + (Debug |> toString) |> Run
+  "run" |> Run
 )
 
-"build" ==> "deploy"
+// --------------------------------------------------------------------------------------
+// RELEASE
+// --------------------------------------------------------------------------------------
 
+//https://docs.microsoft.com/ru-ru/dotnet/core/rid-catalog
+let runtime = "win10-x64"
+
+Target "deploy" (fun _ ->
+  DotNetCli
+    .Publish
+    (fun p -> 
+      { 
+        p with 
+          Project = solution
+          Configuration = Release |> toString
+          Runtime = runtime
+      }
+    )
+)
+
+"build" + (Release |> toString) ==> "deploy"
+
+
+
+// DEBUG DEFAULT
 RunTargetOrDefault "run"
